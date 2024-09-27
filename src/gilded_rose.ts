@@ -1,3 +1,13 @@
+const BACKSTAGE_PASS = "Backstage passes to a TAFKAL80ETC concert";
+const AGED_BRIE = "Aged Brie";
+const SULFURAS = "Sulfuras, Hand of Ragnaros";
+
+enum SellInDays {
+  ZERO = 0,
+  FIVE = 5,
+  TEN = 10,
+}
+
 export class Item {
   name: string;
   sellIn: number;
@@ -26,6 +36,10 @@ function canQualityDecreased(quality: number) {
   return quality > 0;
 }
 
+function hasExpired(sellIn: number) {
+  return sellIn < SellInDays.ZERO;
+}
+
 export class Shop {
   items: Item[];
 
@@ -35,26 +49,26 @@ export class Shop {
 
   updateQuality() {
     for (var i = 0; i < this.items.length; i++) {
-      if (this.items[i].name === "Sulfuras, Hand of Ragnaros") {
+      if (this.items[i].name === SULFURAS) {
         continue;
       }
 
       this.items[i].sellIn--;
 
-      if (this.items[i].name == "Backstage passes to a TAFKAL80ETC concert") {
-        if (this.items[i].sellIn < 0) {
+      if (this.items[i].name == BACKSTAGE_PASS) {
+        if (hasExpired(this.items[i].sellIn)) {
           this.items[i].quality = 0;
           continue;
         }
         if (canQualityIncreased(this.items[i].quality)) {
           this.items[i].quality++;
         }
-        if (this.items[i].sellIn < 10) {
+        if (this.items[i].sellIn < SellInDays.TEN) {
           if (canQualityIncreased(this.items[i].quality)) {
             this.items[i].quality++;
           }
         }
-        if (this.items[i].sellIn < 5) {
+        if (this.items[i].sellIn < SellInDays.FIVE) {
           if (canQualityIncreased(this.items[i].quality)) {
             this.items[i].quality++;
           }
@@ -62,12 +76,12 @@ export class Shop {
         continue;
       }
 
-      if (this.items[i].name === "Aged Brie") {
+      if (this.items[i].name === AGED_BRIE) {
         if (canQualityIncreased(this.items[i].quality)) {
           this.items[i].quality++;
         }
         if (
-          this.items[i].sellIn < 0 &&
+          hasExpired(this.items[i].sellIn) &&
           canQualityIncreased(this.items[i].quality)
         ) {
           this.items[i].quality++;
@@ -79,7 +93,7 @@ export class Shop {
         this.items[i].quality--;
       }
 
-      if (this.items[i].sellIn < 0) {
+      if (hasExpired(this.items[i].sellIn)) {
         if (canQualityDecreased(this.items[i].quality)) {
           this.items[i].quality--;
         }
